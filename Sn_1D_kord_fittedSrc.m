@@ -6,7 +6,7 @@
 % Multiple region  problem are defined by the cross section.
 % E: 2 energy groups. 
 % Angle: Sn.
-% Time: steady state.moot
+% Time: steady state.
 % MMS Source: Fixed specified source, angle-dependent
 %% Main Function
 function [ ] = Sn_1D_kord_fittedSrc()
@@ -63,7 +63,7 @@ function [phi0_j_g1,phi0_j_g2]=Sn_1D_RMS(J,FDM)
 
     % specify material cross sections.
     % scattering xs multiplier 0<multiplier<1.008
-    multiplier=1*0.95;
+    multiplier=1*1.0;
     % group 1, fast group
     Sig_ss_g1=zeros(J,1); % Self-scattering xs.
     Sig_rm_g1=zeros(J,1); % Removal xs from g1 to g2. 
