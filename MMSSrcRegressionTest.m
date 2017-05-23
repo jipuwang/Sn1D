@@ -1,13 +1,15 @@
 % This is a regression test for refactoring code MMS source case. 
 % J=120;
 % N=4;
+clear;
+Sn_1D_kord_MMSSrc()
 % reference solution
 [ref_phi0_g1,ref_phi0_g2]=ref();
 % create global phi0_j_g1 and phi0_j_g2 so you can access the flux outside
 % of the function
-global phi0_j_g1 phi0_j_g2
-error_g1=max(phi0_j_g1-ref_phi0_g1)
-error_g2=max(phi0_j_g2-ref_phi0_g2)
+global getter_phi0_j_g1 getter_phi0_j_g2
+error_g1=max(getter_phi0_j_g1-ref_phi0_g1)
+error_g2=max(getter_phi0_j_g2-ref_phi0_g2)
 
 
 
