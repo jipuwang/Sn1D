@@ -25,7 +25,7 @@ function [ ] = Sn_1D_spatial(FDM)
 %     nCells=160*[1,2,4,8,16];
 %     nCells=[10,20,40,80];
 %     nCells=[60];
-    nCells=[1,2,4]*60*2%*4*4*4;
+    nCells=[1,2,4,8]*60*2%*4*4*4;
     nRuns=size(nCells,2);
     RMSs_phi0_g1=zeros(nRuns,1);
     RMSs_phi0_g2=zeros(nRuns,1);
@@ -154,12 +154,13 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
 
 %% For the fast group
     % Bounday conditions and source
-    % phi=Reg1:y = 1.5593897658139900E-03 x2 -1.3533502228265900E-03 x + 6.3255899575709700E-02
+    % phi=Reg1:y = 1.5593897658139900E-03 x2 -1.3533502228265900E-03 x +6.3255899575709700E-02
     psi_b1_n=0.5*(6.3255899575709700E-02)*ones(N,1); % the -tive half N/2 are not useful
-    % phi=Reg3:y = 1.6006807673739400E-03 x2 -1.8963240555487500E-01 x + 5.6794357067491300E+00
-    psi_b2_n=0.5*(1.6006807673739400E-03*Z*Z ...
-        - 1.8963240555487500E-01*Z ...
-        + 5.6794357067491300E+00)*ones(N,1); % the +tive half N/2 are not useful
+    % phi=Reg3:y = 1.6006807673739400E-03 x2 -1.8963240555487500E-01 x +5.6794357067491300E+00
+    Z_Reg1=Z/3;
+    psi_b2_n=0.5*(1.5593897658139900E-03*Z_Reg1*Z_Reg1 ...
+        -1.3533502228265900E-03*Z_Reg1 ...
+        +6.3255899575709700E-02)*ones(N,1); % the +tive half N/2 are not useful
 
     Q_MMS_n_j_g1=zeros(N,J); % preallocate memory, avg'ed over tau_(j-1/2) and tau_(j+1/2)
     phi0_MMS_j_g1=zeros(J,1);
@@ -225,7 +226,7 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
         phi0_j_g1=zeros(J,1);
 
         for n=(N/2+1):N
-            for j=1:J
+            for j=1:J/3
                 if j==1
                     psi_n_in=psi_b1_n(n);
                 end
@@ -238,8 +239,8 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
         end
 
         for n=1:N/2
-            for j=J:-1:1
-                if j==J
+            for j=J/3:-1:1
+                if j==J/3
                     psi_n_in=psi_b2_n(n);
                 end
                 temp=abs(mu_n(n))+abs(alpha_n(n))*Sig_t_g1(j)*h*0.5;
@@ -250,28 +251,28 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
             end
         end
 
-        error=max(abs(phi0_j_g1-phi0_g1_j_old)./(phi0_j_g1+delta))
+        error=max(abs(phi0_j_g1(1:J/3)-phi0_g1_j_old(1:J/3))./(phi0_j_g1(1:J/3)+delta))
         if error<epsilon
             break;
         else
-            phi0_g1_j_old=phi0_j_g1;
+            phi0_g1_j_old(1:J/3)=phi0_j_g1(1:J/3);
         end
     end
     k
     if k>kMax-1
         display 'Not converging';
     end
-    figure(13);plot(phi0_j_g1,'-*');
+    figure(17);plot(phi0_j_g1,'-*');
     title('fast flux');
 
 %% For thermal group
     % Bounday conditions and source
-    % phi=Reg1:y = +3.7420664087460500E-04x2 +3.2444814149334100E-03x +1.2139249518777500E-02
+    % phi=Reg1:y = +3.7420664087460500E-04 x2 +3.2444814149334100E-03 x +1.2139249518777500E-02
     psi_b1_n=0.5*1.2139249518777500E-02*ones(N,1); % the -tive half N/2 are not useful
     % phi=Reg3:y = +3.6321032591887700E-04x2 -4.7314818437341200E-02x +1.5394028032516800E+00
-    psi_b2_n=0.5*(+3.6321032591887700E-04*Z*Z ...
-                  -4.7314818437341200E-02*Z ...
-                  +1.5394028032516800E+00)*ones(N,1); % the +tive half N/2 are not useful
+    psi_b2_n=0.5*(+3.7420664087460500E-04*Z_Reg1*Z_Reg1 ...
+                  +3.2444814149334100E-03*Z_Reg1 ...
+                  +1.2139249518777500E-02)*ones(N,1); % the +tive half N/2 are not useful
     Q_n_j_g2=zeros(N,J); % Inscatter/downscatter from group 1. 
     for j=1:J
         Q_n_j_g2(:,j)=0.5*Sig_rm_g1(j)*phi0_j_g1(j);
@@ -343,7 +344,7 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
         phi0_j_g2=zeros(J,1);
 
         for n=(N/2+1):N
-            for j=1:J
+            for j=1:J/3
                 if j==1
                     psi_n_in=psi_b1_n(n);
                 end
@@ -356,8 +357,8 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
         end
 
         for n=1:N/2
-            for j=J:-1:1
-                if j==J
+            for j=J/3:-1:1
+                if j==J/3
                     psi_n_in=psi_b2_n(n);
                 end
                 temp=abs(mu_n(n))+abs(alpha_n(n))*Sig_t_g2(j)*h*0.5;
@@ -368,11 +369,11 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
             end
         end
 
-        error=max(abs(phi0_j_g2-phi0_j_g2_old)./(phi0_j_g2+delta))
+        error=max(abs(phi0_j_g2(1:J/3)-phi0_j_g2_old(1:J/3))./(phi0_j_g2(1:J/3)+delta))
         if error<epsilon
             break;
         else
-            phi0_j_g2_old=phi0_j_g2;
+            phi0_j_g2_old(1:J/3)=phi0_j_g2(1:J/3);
         end
     end
     k
@@ -380,8 +381,8 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
         display 'Not converging';
     end
     % plots
-    figure(14);plot(phi0_j_g2,'-*'); title('thermal flux');
-    figure(15);plot(phi0_j_g1,'-*'); hold on; plot(phi0_j_g2,'-*');
+    figure(18);plot(phi0_j_g2,'-*'); title('thermal flux');
+    figure(19);plot(phi0_j_g1,'-*'); hold on; plot(phi0_j_g2,'-*');
     title('with Manufactured Source');
     legend('fast flux','thermal flux'); hold off;
     
@@ -391,7 +392,7 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
     getter_phi0_j_g2=phi0_j_g2;
     
     % grid function norm
-    error_j_g1=norm(phi0_j_g1-phi0_MMS_j_g1)/sqrt(J);
-    error_j_g2=norm(phi0_j_g2-phi0_MMS_j_g2)/sqrt(J);
+    error_j_g1=norm(phi0_j_g1(1:J/3)-phi0_MMS_j_g1(1:J/3))/sqrt(J);
+    error_j_g2=norm(phi0_j_g2(1:J/3)-phi0_MMS_j_g2(1:J/3))/sqrt(J);
 end
 
