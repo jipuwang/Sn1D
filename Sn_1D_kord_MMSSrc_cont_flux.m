@@ -391,6 +391,6 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
     
     % grid function norm
     error_j_g1=norm(phi0_j_g1-phi0_MMS_j_g1)/sqrt(J);
-    error_j_g2=norm(phi0_j_g2-phi0_MMS_j_g2)/sqrt(J);
+    error_j_g2=norm(phi0_j_g2-phi0_MMS_j_g2)/sqrt(J); 
 end
 
