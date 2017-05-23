@@ -153,12 +153,12 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
 
 %% For the fast group
     % Bounday conditions and source
-    % phi=Reg1:y = 1.5593897658139900E-03 x2 -1.3533502228265900E-03 x + 6.3255899575709700E-02
+    % phi=Reg1:y = +1.5593897658139900E-03 x2 -1.3533502228265900E-03 x +6.3255899575709700E-02
     psi_b1_n=0.5*(6.3255899575709700E-02)*ones(N,1); % the -tive half N/2 are not useful
-    % phi=Reg3:y = 1.6006807673739400E-03 x2 -1.8963240555487500E-01 x + 5.6794357067491300E+00
-    psi_b2_n=0.5*(1.6006807673739400E-03*Z*Z ...
-        - 1.8963240555487500E-01*Z ...
-        + 5.6794357067491300E+00)*ones(N,1); % the +tive half N/2 are not useful
+    % phi=Reg3:y = +1.6006807673739400E-03 x2 -1.8963240555487500E-01 x +5.6794357067491300E+00
+    psi_b2_n=0.5*(+1.6006807673739400E-03*Z*Z ...
+        -1.8963240555487500E-01*Z ...
+        +5.6794357067491300E+00)*ones(N,1); % the +tive half N/2 are not useful
 
     Q_MMS_n_j_g1=zeros(N,J); % preallocate memory, avg'ed over tau_(j-1/2) and tau_(j+1/2)
     phi0_MMS_j_g1=zeros(J,1);
