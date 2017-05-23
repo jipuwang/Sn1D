@@ -24,12 +24,14 @@ function [ ] = Sn_1D_spatial(FDM)
 %     nCells=160*[1,2,4,8,16];
 %     nCells=[10,20,40,80];
 %     nCells=[60];
-    nCells=[60]*2%*4*4*4;
+    nCells=[1,2,4]*60*2%*4*4*4;
     nRuns=size(nCells,2);
+    RMSs_phi0_g1=zeros(nRuns,1);
+    RMSs_phi0_g2=zeros(nRuns,1);
     for iRun=1:nRuns
         nCell=nCells(iRun);
-        [error_j_g1,error_j_g2]=Sn_1D_RMS(nCell,FDM);
-        % process phi0_g1_j and phi0_g2_j
+        [RMSs_phi0_g1(iRun),RMSs_phi0_g2(iRun)]=Sn_1D_RMS(nCell,FDM);
+        % process error_j_g1,error_j_g2
     end %iRun
 
     % display the results
@@ -42,9 +44,20 @@ function [ ] = Sn_1D_spatial(FDM)
             case 3
                 disp('FDM: Step Characteristics');
         end
-%         display(phi0_g1_j);
-%         display(phi0_g2_j);
+        display(RMSs_phi0_g1);
+        display(RMSs_phi0_g2);
     end %if
+    
+    p_phi0_g1=zeros(nRuns-1,1);
+    p_phi0_g2=zeros(nRuns-1,1);
+    for i=1:nRuns-1
+        p_phi0_g1=log(RMSs_phi0_g1(i)/RMSs_phi0_g1(i+1))/log(nCells(i+1)/nCells(i));
+        p_phi0_g2=log(RMSs_phi0_g2(i)/RMSs_phi0_g2(i+1))/log(nCells(i+1)/nCells(i));
+    end
+    
+    display(p_phi0_g1);
+    display(p_phi0_g2);
+   
 end
 
 %% Error Estimate - RMS
