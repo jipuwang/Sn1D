@@ -26,6 +26,7 @@ function [ ] = Sn_1D_spatial(FDM)
 %     nCells=[60];
     nCells=[60]*2%*4*4*4;
     nRuns=size(nCells,2);
+    global phi0_j_g1 phi0_j_g2 % so this can be accessed by the regression test
     for iRun=1:nRuns
         nCell=nCells(iRun);
         [phi0_j_g1,phi0_j_g2]=Sn_1D_RMS(nCell,FDM);
