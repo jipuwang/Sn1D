@@ -51,8 +51,8 @@ function [ ] = Sn_1D_spatial(FDM)
     p_phi0_g1=zeros(nRuns-1,1);
     p_phi0_g2=zeros(nRuns-1,1);
     for i=1:nRuns-1
-        p_phi0_g1=log(RMSs_phi0_g1(i)/RMSs_phi0_g1(i+1))/log(nCells(i+1)/nCells(i));
-        p_phi0_g2=log(RMSs_phi0_g2(i)/RMSs_phi0_g2(i+1))/log(nCells(i+1)/nCells(i));
+        p_phi0_g1(i)=log(RMSs_phi0_g1(i)/RMSs_phi0_g1(i+1))/log(nCells(i+1)/nCells(i));
+        p_phi0_g2(i)=log(RMSs_phi0_g2(i)/RMSs_phi0_g2(i+1))/log(nCells(i+1)/nCells(i));
     end
     
     display(p_phi0_g1);
