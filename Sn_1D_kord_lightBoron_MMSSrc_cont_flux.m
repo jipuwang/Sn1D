@@ -208,15 +208,17 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
   % MMS source: mu_n/2 * derivative(phi_MMS_g1) ...
   % + (Sig_t-Sig_ss)*0.5 * phi_MMS_g1
   phi0_MMS_j_g1=zeros(J,1);
+  phi0_MMS_Diff_j_g1=zeros(J,1); % This is needed to build MMS source
 
   % Fast MMS Source in Region 1
   % phi_MMS_g1 = reg1
   for j=1:J/3
     x_L=(j-1)*h;x_R=j*h;
     phi0_MMS_j_g1(j)= 1/h*integral(reg1,x_L,x_R);
+    phi0_MMS_Diff_j_g1(j)= 1/h*integral(reg1Diff,x_L,x_R);
     for n=1:N
-    Q_MMS_n_j_g1(n,j)=mu_n(n)*0.5*(2*reg1x2 *0.5*(j-1+j)*h +reg1x1) ...
-      +(Sig_t_g1(j)-Sig_ss_g1(j))*0.5 * phi0_MMS_j_g1(j);
+    Q_MMS_n_j_g1(n,j)=mu_n(n)*0.5* phi0_MMS_Diff_j_g1(j) ...
+      +(Sig_t_g1(j)-Sig_ss_g1(j))*0.5* phi0_MMS_j_g1(j);
     end % n
   end % j
   % Fast MMS Source in Region 2
@@ -225,9 +227,10 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
   for j=J/3+1:2/3*J
     x_L=(j-1)*h;x_R=j*h;
     phi0_MMS_j_g1(j)= 1/h*integral(reg2,x_L,x_R);
+    phi0_MMS_Diff_j_g1(j)= 1/h*integral(reg2Diff,x_L,x_R);
     for n=1:N
-    Q_MMS_n_j_g1(n,j)=mu_n(n)*0.5*(2*reg2x2 *0.5*(j-1+j)*h +reg2x1) ...
-      +(Sig_t_g1(j)-Sig_ss_g1(j))*0.5 * phi0_MMS_j_g1(j);
+    Q_MMS_n_j_g1(n,j)=mu_n(n)*0.5* phi0_MMS_Diff_j_g1(j) ...
+      +(Sig_t_g1(j)-Sig_ss_g1(j))*0.5* phi0_MMS_j_g1(j);
     end % n
   end % j
   % Fast MMS Source in Region 3
@@ -235,9 +238,10 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
   for j=2/3*J+1:J
     x_L=(j-1)*h;x_R=j*h;
     phi0_MMS_j_g1(j)= 1/h*integral(reg3,x_L,x_R);
+    phi0_MMS_Diff_j_g1(j)= 1/h*integral(reg3Diff,x_L,x_R);
     for n=1:N
-    Q_MMS_n_j_g1(n,j)=mu_n(n)*0.5*(2*reg3x2 *0.5*(j-1+j)*h +reg3x1) ...
-      +(Sig_t_g1(j)-Sig_ss_g1(j))*0.5 * phi0_MMS_j_g1(j);
+    Q_MMS_n_j_g1(n,j)=mu_n(n)*0.5* phi0_MMS_Diff_j_g1(j) ...
+      +(Sig_t_g1(j)-Sig_ss_g1(j))*0.5* phi0_MMS_j_g1(j);
     end % n
   end % j
 
@@ -356,14 +360,17 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
   % + (Sig_t-Sig_ss)*0.5 * phi_MMS_g2
   % - Sig_g1_rm*0.5 * (phi_MMS_g1)
   phi0_MMS_j_g2=zeros(J,1);
+  phi0_MMS_Diff_j_g2=zeros(J,1); % This is needed to build MMS source
+  
   % Thermal MMS Source in Region 1
   % phi_MMS_g1 = reg1
   for j=1:J/3
     x_L=(j-1)*h;x_R=j*h;
     phi0_MMS_j_g2(j)= 1/h*integral(reg1,x_L,x_R);
+    phi0_MMS_Diff_j_g2(j)= 1/h*integral(reg1Diff,x_L,x_R);
     for n=1:N
-    Q_MMS_n_j_g2(n,j)=mu_n(n)*0.5*(2*reg1x2 *0.5*(j-1+j)*h +reg1x1) ...
-      +(Sig_t_g2(j)-Sig_ss_g2(j))*0.5 * phi0_MMS_j_g2(j) ...
+    Q_MMS_n_j_g2(n,j)=mu_n(n)*0.5* phi0_MMS_Diff_j_g2(j) ...
+      +(Sig_t_g2(j)-Sig_ss_g2(j))*0.5* phi0_MMS_j_g2(j) ...
       -Sig_rm_g1(j)*0.5 * phi0_MMS_j_g1(j);
     end % n
   end % j
@@ -374,9 +381,10 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
   for j=J/3+1:2/3*J
     x_L=(j-1)*h;x_R=j*h;
     phi0_MMS_j_g2(j)= 1/h*integral(reg2,x_L,x_R);
+    phi0_MMS_Diff_j_g2(j)= 1/h*integral(reg2Diff,x_L,x_R);
     for n=1:N
-    Q_MMS_n_j_g2(n,j)=mu_n(n)*0.5*(2*reg2x2 *0.5*(j-1+j)*h +reg2x1) ...
-      +(Sig_t_g2(j)-Sig_ss_g2(j))*0.5 * phi0_MMS_j_g2(j) ...
+    Q_MMS_n_j_g2(n,j)=mu_n(n)*0.5* phi0_MMS_Diff_j_g2(j) ...
+      +(Sig_t_g2(j)-Sig_ss_g2(j))*0.5* phi0_MMS_j_g2(j) ...
       -Sig_rm_g1(j)*0.5 * phi0_MMS_j_g1(j);
     end % n
   end % j
@@ -386,9 +394,10 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
   for j=2/3*J+1:J
     x_L=(j-1)*h;x_R=j*h;
     phi0_MMS_j_g2(j)= 1/h*integral(reg3,x_L,x_R);
+    phi0_MMS_Diff_j_g2(j)= 1/h*integral(reg3Diff,x_L,x_R);
     for n=1:N
-    Q_MMS_n_j_g2(n,j)=mu_n(n)*0.5*(2*reg3x2 *0.5*(j-1+j)*h +reg3x1) ...
-      +(Sig_t_g2(j)-Sig_ss_g2(j))*0.5 * phi0_MMS_j_g2(j) ...
+    Q_MMS_n_j_g2(n,j)=mu_n(n)*0.5* phi0_MMS_Diff_j_g2(j) ...
+      +(Sig_t_g2(j)-Sig_ss_g2(j))*0.5* phi0_MMS_j_g2(j) ...
       -Sig_rm_g1(j)*0.5 * phi0_MMS_j_g1(j);
     end % n
   end % j
