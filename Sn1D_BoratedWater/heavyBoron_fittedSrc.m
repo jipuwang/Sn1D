@@ -9,7 +9,7 @@
 % Time: steady state.
 % MMS Source: Fixed specified source, angle-dependent
 %% Main Function
-function [ ] = Sn_1D_kord_fittedSrc()
+function [ ] = heavyBoron_fittedSrc()
 %     FDMs=[1,2,3];
     FDMs=[2];
     % 1:Step; 2:DD; 3:SC;

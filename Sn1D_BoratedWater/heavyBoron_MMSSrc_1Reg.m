@@ -10,7 +10,7 @@
 % Time: steady state.
 % MMS Source: Fixed specified source, angle-dependent
 %% Main Function
-function [ ] = Sn_1D_kord_MMSSrc_1Reg()
+function [ ] = heavyBoron_MMSSrc_1Reg()
 %     FDMs=[1,2,3];
     FDMs=[2];
     % 1:Step; 2:DD; 3:SC;
