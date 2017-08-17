@@ -289,9 +289,8 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
     error=max(abs(phi0_j_g1-phi0_g1_j_old)./(phi0_j_g1+delta))
     if error<epsilon
       break;
-    else
-      phi0_g1_j_old=phi0_j_g1;
     end
+    phi0_g1_j_old=phi0_j_g1;
   end
   k
   if k>kMax-1
@@ -450,9 +449,8 @@ function [error_j_g1,error_j_g2]=Sn_1D_RMS(J,FDM)
     error=max(abs(phi0_j_g2-phi0_j_g2_old)./(phi0_j_g2+delta))
     if error<epsilon
       break;
-    else
-      phi0_j_g2_old=phi0_j_g2;
     end
+    phi0_j_g2_old=phi0_j_g2;
   end
   k
   if k>kMax-1
