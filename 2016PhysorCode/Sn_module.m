@@ -53,11 +53,29 @@ function [phi0_j]=Sn_module(J,N,Tau,mat,...
   
   % Default variables, can be customized. 
   maxIterate=2000;
+  FDM=3;
   epsilon_phi0=1e-13;
   delta=1E-13;
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
-  
   h_j=ones(J,1)*Tau/J;
+  h=Tau/J;
+  
+  % Spatial discretization Method
+  % =1 -> Step Method; Upwind; Implicit;Step;
+  % =2 -> Diamond Differencing;DD;
+  % =3 -> Step Characteristic;SC;
+  % would be alpha_nj(N,J) with nonuniform spatial grid
+  switch FDM
+    case 1 % Step
+      alpha_n=ones(N,1);
+      alpha_n(1:N/2)=-1;
+    case 2 % DD
+      alpha_n=zeros(N,1);
+    case 3 % SC
+      tao_n=h./mu_n;
+      alpha_n=coth(0.5*tao_n)-2./tao_n;
+  end % switch FDM
+  
   % N rays to trace, each angle has only 1 ray, no ray-spacing
   % n for each angle, and j for FSR region index
   
@@ -70,48 +88,26 @@ function [phi0_j]=Sn_module(J,N,Tau,mat,...
       end
     end
     phi0_j_new=zeros(J,1);
-    % ray tracing
-    %%
-%     for n=1:N/2 % backward direction
-%       psi_in=psi_b2_n(n);
-%       for j=J:-1:1
-%         exp_temp=exp(-Sig_t_j(j)*segLen_j_n(j,n));
-%         psi_out=psi_in*exp_temp+q_j_n(j,n)*Sig_t_inv_j(j)*(1-exp_temp);
-%         psi_avg=q_j_n(j,n)*Sig_t_inv_j(j)+(psi_in-psi_out)/Sig_t_j(j)/segLen_j_n(j,n);
-%         phi0_j_new(j)=phi0_j_new(j)+weight_n(n)*psi_avg;
-%         psi_in=psi_out;
-%       end
-%     end
-   %% backward direction
+
+
+    %% backward direction
     for n=1:N/2
       psi_in=psi_b2_n(n);
       for j=J:-1:1
-        temp=abs(mu_n(n))+abs(alpha_n(n))*Sig_t_g1(j)*h*0.5;
-        psi_out=((temp-0.5*Sig_t_g1(j)*h)*psi_in+(self_scat_n_j(n,j)+Q_MMS_n_j_g1(n,j))*h)/(temp+0.5*Sig_t_g1(j)*h);
+        temp=abs(mu_n(n))+abs(alpha_n(n))*Sig_t_j(j)*h*0.5;
+        psi_out=((temp-0.5*Sig_t_j(j)*h)*psi_in+(q_j_n(j,n))*h)/(temp+0.5*Sig_t_j(j)*h);
         psi_avg=0.5*(1+abs(alpha_n(n)))*psi_out+0.5*(1-abs(alpha_n(n)))*psi_in;
         phi0_j_new(j)=phi0_j_new(j)+psi_avg*weight_n(n);
         psi_in=psi_out;
       end
     end
 
-   %%
-    %%
-%     for n=N/2+1:N % forward direction
-%       psi_in=psi_b1_n(n);
-%       for j=1:J
-%         exp_temp=exp(-Sig_t_j(j)*segLen_j_n(j,n));
-%         psi_out=psi_in*exp_temp+q_j_n(j,n)*Sig_t_inv_j(j)*(1-exp_temp);
-%         psi_avg=q_j_n(j,n)*Sig_t_inv_j(j)+(psi_in-psi_out)/Sig_t_j(j)/segLen_j_n(j,n);
-%         phi0_j_new(j)=phi0_j_new(j)+weight_n(n)*psi_avg;
-%         psi_in=psi_out;
-%       end
-%     end
 %% forward direction
     for n=(N/2+1):N
       psi_in=psi_b1_n(n);
       for j=1:J
-        temp=mu_n(n)+alpha_n(n)*Sig_t_g1(j)*h*0.5;
-        psi_out=((temp-0.5*Sig_t_g1(j)*h)*psi_in+(self_scat_n_j(n,j)+Q_MMS_n_j_g1(n,j))*h)/(temp+0.5*Sig_t_g1(j)*h);
+        temp=mu_n(n)+alpha_n(n)*Sig_t_j(j)*h*0.5;
+        psi_out=((temp-0.5*Sig_t_j(j)*h)*psi_in+(q_j_n(j,n))*h)/(temp+0.5*Sig_t_j(j)*h);
         psi_avg=0.5*(1+alpha_n(n))*psi_out+0.5*(1-alpha_n(n))*psi_in;
         phi0_j_new(j)=phi0_j_new(j)+psi_avg*weight_n(n);
         psi_in=psi_out;
