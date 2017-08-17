@@ -23,8 +23,8 @@ if ~exist('assumedSoln','var')
   assumedSoln='constant';
   assumedSoln='linear';
   assumedSoln='quadratic';
-  assumedSoln='plus1Sqrt';
-  assumedSoln='flat_expMu';
+%   assumedSoln='plus1Sqrt';
+%   assumedSoln='flat_expMu';
 end
 
 error_phi0_n=zeros(nGrids,1);
