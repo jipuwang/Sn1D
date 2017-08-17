@@ -3,7 +3,7 @@
     % Manufactured boundary conditions
     % Manufactured source
 function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
-          manufacturer_Sn(J,N,Tau,mat,assumedSoln,fbType)
+          manufacturer_Sn(J,N,Tau,mat,assumedSoln)
   % input parameters
   if ~exist('J','var')
     J=5*2;%*2%*2*2*2*2*2*2*2*2
@@ -28,11 +28,6 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
   end
   if ~exist('assumedSoln','var')
     assumedSoln='constant';
-  end
-  if ~exist('fbType','var')
-%     fbType='linear';
-    fbType='noFeedback';
-%     fbType='sqareRoot';
   end
   % Material
   Sig_t_j=mat.Sig_t_j;
@@ -73,21 +68,7 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
 %       display('not defined cases');
   end
   
-  %% XS update due to temperature feedback!
-  % Change in capture is reflected in change in total. 
-  switch fbType
-    case 'noFeedback'
-      Sig_gamma =@(x) mat.Sig_gamma_j(1)+0.0*x;
-    case 'linear'
-      % Assumes the original xs is homogeneous
-      T0=50;
-      gamma_coeff=0.004;
-      Sig_gamma =@(x) mat.Sig_gamma_j(1)+gamma_coeff*(T_MMS(x)-T0);
-    case 'squareRootPlus1'
-      T0=50;
-      Sig_gamma =@(x) mat.Sig_gamma_j(1)*sqrt((T0+1)./(T_MMS(x)+1));
-  end
-  
+  Sig_gamma =@(x) Sig_gamma_j(1)+0.0*x;
   Sig_ss =@(x) Sig_ss_j(1)+x*0;
   Sig_f =@(x) Sig_f_j(1)+x*0;
   nuSig_f =@(x) nuSig_f_j(1)+x*0;
