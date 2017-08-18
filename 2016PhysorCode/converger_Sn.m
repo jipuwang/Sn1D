@@ -56,28 +56,7 @@ for iGrid=1:nGrids
 % error_ang_j=error_ang_j.*0.0;
   error_phi0_n(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J) 
   
-%   % Plot the solution
-%   figure(11);
-%   plot(phi0_j,'*-');
-%   hold on;
-%   grid on;
-%   switch assumedSoln
-%     case 'sine_sine_sine'
-%       phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*4.090350086939905;
-%     case 'sine_exp_exp'
-%       phi0_MMS =@(x) (sin(pi/(size(phi0_j,1)).*x)+1)*37.102114262431876;
-%     case 'IHM'
-%       phi0_MMS =@(x) 2.0+0.0*x;
-%   end
-%   
-%   fplot(phi0_MMS,[0,size(phi0_j,1)],'bo-');
-%   legend('numerical','analytical');
-%   title('scalar flux');
-%   xlabel('mesh size [cm]');
-%   ylabel('scalar flux');
-  
 end
-% figure(11); hold off;
 
 % Calculate the order of accuracy
 order_phi_nMinus1=ones(nGrids-1,1);
