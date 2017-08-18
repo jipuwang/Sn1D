@@ -47,7 +47,7 @@ for iGrid=1:nGrids
 
   [phi0_j_ana,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=... 
         manufacturer_Sn(J,N,Tau,mat,assumedSoln);
-      
+%   error_ang_j=error_ang_j*0.0;
   [phi0_j]=Sn_module(J,N,Tau,mat,...
     psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j);
 
