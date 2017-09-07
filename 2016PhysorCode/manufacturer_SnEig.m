@@ -3,7 +3,7 @@
     % Manufactured boundary conditions
     % Manufactured source
 function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
-          manufacturer_SnEig(J,N,Tau,mat,assumedSoln)
+          manufacturer_SnEig(J,N,Tau,mat,assumedSoln,assumedK)
   % input parameters
   if ~exist('J','var')
     J=5*2;%*2%*2*2*2*2*2*2*2*2
@@ -29,6 +29,10 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
   if ~exist('assumedSoln','var')
     assumedSoln='constant';
   end
+  if ~exist('assumedK','var')
+    assumedK=1.02;
+  end
+  
   % Material
   Sig_t_j=mat.Sig_t_j;
   Sig_ss_j=mat.Sig_ss_j;
@@ -42,7 +46,7 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
   
   %% Manufactured Solutions for both fields
-  % Options includes:   assumedSoln='constant'; 'linear'; 'quadratic';
+  % Options includes: assumedSoln='constant'; 'linear'; 'quadratic';
   % 'plus1Sqrt'; 'other_anisotropic';
 
   switch(assumedSoln)
