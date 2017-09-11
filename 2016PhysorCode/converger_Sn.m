@@ -9,7 +9,7 @@
 % the problem description. 
 % It needs to know the geometry and is responsible for generating the grid
 % and pass the grid information to the coupler. 
-function [order_phi]=converger_Sn(assumedSoln)
+function [order_phi]=converger_Sn(assumedSoln,FDM)
 % clear;
 nGrids=4%8%4%4%6;%10;%8;
 refinementRatio=2;
@@ -19,6 +19,9 @@ N=2; % angular discretization, fixed not refined.
 Tau=10; 
 
 % Case configure options
+if ~exist('FDM','var')
+  FDM=3;
+end
 if ~exist('assumedSoln','var')
   assumedSoln='constant';
   assumedSoln='linear';
@@ -48,7 +51,7 @@ for iGrid=1:nGrids
   [phi0_j_ana,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=... 
         manufacturer_Sn(J,N,Tau,mat,assumedSoln);
 %   error_ang_j=error_ang_j*0.0;
-  [phi0_j]=Sn_module(J,N,Tau,mat,...
+  [phi0_j]=Sn_module(FDM,J,N,Tau,mat,...
     psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j);
 
   % Calculate the error compared to manufactured solution
