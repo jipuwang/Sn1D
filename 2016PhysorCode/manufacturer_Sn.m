@@ -65,13 +65,12 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
       % add code here
       psi_MMS =@(x,mu) (1.0+0.0*x).*exp(mu);
       psi_MMS_Diff =@(x,mu) (0.0+0.0*x).*exp(mu);
-%       display('not defined cases');
   end
   
   Sig_gamma =@(x) Sig_gamma_j(1)+0.0*x;
-  Sig_ss =@(x) Sig_ss_j(1)+x*0;
-  Sig_f =@(x) Sig_f_j(1)+x*0;
-  nuSig_f =@(x) nuSig_f_j(1)+x*0;
+  Sig_ss =@(x) Sig_ss_j(1)+0.0*x;
+  Sig_f =@(x) Sig_f_j(1)+0.0*x;
+  nuSig_f =@(x) nuSig_f_j(1)+0.0*x;
   Sig_t =@(x) Sig_ss(x)+Sig_f(x)+Sig_gamma(x);
   
 %% Manufactured scalar flux and source
@@ -80,8 +79,8 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
   % -(Sig_ss+nuSig_f)*0.5*phi0_MMS;
   Q_MMS =@(x,mu) mu*psi_MMS_Diff(x,mu) +Sig_t(x).*psi_MMS(x,mu) ...
     -(Sig_ss(x))*0.5.*phi0_MMS(x);
-  
-  %% For MoC MMS solution and problem
+
+  %% For MMS solution and problem
   % Boundary condition and source
   psi_b1_n=zeros(N,1);
   % psi expression evaluated at x=0
