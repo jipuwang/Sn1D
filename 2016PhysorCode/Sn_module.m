@@ -9,12 +9,15 @@
 % Output: 
 %   Cell-averaged scalar flux
 
-function [phi0_j]=Sn_module(J,N,Tau,mat,...
+function [phi0_j]=Sn_module(FDM,J,N,Tau,mat,...
            psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j)
 
 %   Input parameter
   if ~exist('Tau','var')
     Tau=10;
+  end
+  if ~exist('FDM','var')
+    FDM=3;
   end
   if ~exist('J','var')
     J=5*2;%*2%*2*2*2*2*2*2*2*2
@@ -53,7 +56,6 @@ function [phi0_j]=Sn_module(J,N,Tau,mat,...
   
   % Default variables, can be customized. 
   maxIterate=2000;
-  FDM=3;
   epsilon_phi0=1e-13;
   delta=1E-13;
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
