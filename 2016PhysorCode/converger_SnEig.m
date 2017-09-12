@@ -9,12 +9,12 @@
 % the problem description. 
 % It needs to know the geometry and is responsible for generating the grid
 % and pass the grid information to the coupler. 
-function [order_phi0]=converger_SnEig(assumedSoln,assumedK)
+% function [order_phi0]=converger_SnEig(assumedSoln,assumedK)
 % clear;
 nGrids=4%8%4%4%6;%10;%8;
 refinementRatio=2;
-N=2; % angular discretization, fixed not refined. 
-
+N=8; % angular discretization, fixed not refined. 
+FDM=3;
 % Geometry
 Tau=10; 
 
@@ -25,6 +25,7 @@ if ~exist('assumedSoln','var')
   assumedSoln='quadratic';
 %   assumedSoln='plus1Sqrt';
 %   assumedSoln='flat_expMu';
+  assumedSoln='sine';
 end
 
 if ~exist('k_MMS','var')
@@ -37,6 +38,7 @@ error_k_iGrid=zeros(nGrids,1);
 
 for iGrid=1:nGrids
   J=5*refinementRatio^iGrid;
+%   J=20;
   gridMeshSize_iGrid(iGrid)=Tau/J;
   iGrid
   % Material
@@ -50,17 +52,22 @@ for iGrid=1:nGrids
   mat = struct(field1,value1,field2,value2,field3,value3,... 
     field4,value4,field5,value5,field6,value6,field7,value7);
 
-  [phi0_j_ana,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=... 
+  [phi0_j_ana,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_guess]=... 
         manufacturer_SnEig(J,N,Tau,mat,assumedSoln,assumedK);
-%   error_ang_j=error_ang_j*0.0;
-  [k,phi0_j]=SnEig_module(J,N,Tau,mat,...
-    psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j);
 
-  % Calculate the error compared to manufactured solution
-%   error_ang_j=zeros(J,1);
-% error_ang_j=error_ang_j.*0.0;
-  error_phi0_iGrid(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J)
-  error_k_iGrid(iGrid)=k-assumedK
+  %%
+%   error_ang_j=error_ang_j.*0.0;
+%   Q_MMS_j_n=Q_MMS_j_n*0.0;
+%   k_guess=1.0;
+%   phi0_guess_j=ones(J,1);
+  %%
+
+  % Call eigen solver
+  [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
+    psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_guess);
+
+  error_phi0_iGrid(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J);
+  error_k_iGrid(iGrid)=k-assumedK;
   
 end
 
@@ -134,4 +141,4 @@ order_k_nMinus1
 order_phi0=order_phi0_nMinus1(end);
 order_k=order_k_nMinus1(end);
 
-end
+% end
