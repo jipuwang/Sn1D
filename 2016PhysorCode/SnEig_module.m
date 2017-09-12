@@ -120,8 +120,9 @@ function [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
     phi0_old_outer_j=phi0_new_outer_j;
   end
   if ~isOuterConverged
-    display (['Not converging!' num2str(iOuter) ' iterations performed.']);
+    display (['Not converging! ' num2str(iOuter) ' outer iterations performed.']);
   else
+    display (['Eigensolver converged! ' num2str(iOuter) ' outer iterations performed.']);
     phi0_j=phi0_new_outer_j;
     k=k_new;
   end
