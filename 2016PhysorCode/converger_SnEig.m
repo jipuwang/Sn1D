@@ -132,8 +132,11 @@ savefig(kError_plot_handle,'temp_Physor_2016_k_convergence');
 % Display the problem description and results
 disp '=================';
 display(['assumedSoln: ' assumedSoln]);
+display(['Number of grids: ' num2str(nGrids)]);
 display(['refinementRatio: ' num2str(refinementRatio)]);
+display(['FDM method: ' num2str(FDM)]);
 display(['quad set order: ' num2str(N)]);
+
 error_phi0_iGrid
 order_phi0_nMinus1
 display(num2str(order_phi0_nMinus1(end)));
