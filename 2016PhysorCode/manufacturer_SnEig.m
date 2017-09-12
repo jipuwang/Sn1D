@@ -2,8 +2,8 @@
     % Discretized analytical solution
     % Manufactured boundary conditions
     % Manufactured source
-function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
-          manufacturer_SnEig(J,N,Tau,mat,assumedSoln,assumedK)
+function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_guess]=...
+          manufacturer_SnEig(J,N,Tau,mat,assumedSoln,k_MMS)
   % input parameters
   if ~exist('J','var')
     J=5*2;%*2%*2*2*2*2*2*2*2*2
@@ -30,7 +30,7 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
     assumedSoln='constant';
   end
   if ~exist('assumedK','var')
-    assumedK=1.02;
+    k_MMS=1.02;
   end
   
   % Material
@@ -66,10 +66,11 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
       psi_MMS =@(x,mu) sqrt(x+1).*(1.0+0.0*mu);
       psi_MMS_Diff =@(x,mu) 0.5./sqrt(x+1).*(1.0+0.0*mu);
     case('flat_expMu')
-      % add code here
       psi_MMS =@(x,mu) (1.0+0.0*x).*exp(mu);
       psi_MMS_Diff =@(x,mu) (0.0+0.0*x).*exp(mu);
-%       display('not defined cases');
+    case('sine')
+      psi_MMS =@(x,mu) sin(pi*x/Tau)+0.0*mu;%.*exp(mu);
+      psi_MMS_Diff =@(x,mu) pi/Tau*cos(pi*x/Tau)+0.0*mu;%.*exp(mu);
   end
   
   Sig_gamma =@(x) Sig_gamma_j(1)+0.0*x;
@@ -81,9 +82,9 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
 %% Manufactured scalar flux and source
   phi0_MMS =@(x) integral(@(mu) psi_MMS(x,mu), -1,1);
   % MMS source: mu_n * derivative(psi_MMS) +Sig_t* psi_MMS ...
-  % -(Sig_ss+nuSig_f)*0.5*phi0_MMS;
+  % -(Sig_ss+nuSig_f/k)*0.5*phi0_MMS;
   Q_MMS =@(x,mu) mu*psi_MMS_Diff(x,mu) +Sig_t(x).*psi_MMS(x,mu) ...
-    -(Sig_ss(x))*0.5.*phi0_MMS(x);
+    -(Sig_ss(x)+nuSig_f(x))*0.5.*phi0_MMS(x);
   
   %% For MoC MMS solution and problem
   % Boundary condition and source
@@ -115,4 +116,7 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j]=...
     error_ang_j(j)=numSum-phi0_MMS_j(j);
   end % j
 
+  % Determine the phi0_guess_j and k_guess
+  phi0_guess_j=ones(J,1);
+  k_guess=k_MMS*(sum(nuSig_f_j.*phi0_guess_j)*h)/(sum(nuSig_f_j.*phi0_MMS_j)*h);
 end
