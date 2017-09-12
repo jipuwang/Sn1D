@@ -10,7 +10,8 @@
 %   Cell-averaged scalar flux
 
 function [phi0_j]=Sn_module(FDM,J,N,Tau,mat,...
-           psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j)
+           psi_b1_n,psi_b2_n,Q_MMS_j_n,...
+           error_ang_j,phi0_guess_j)
 
 %   Input parameter
   if ~exist('Tau','var')
@@ -47,6 +48,10 @@ function [phi0_j]=Sn_module(FDM,J,N,Tau,mat,...
     Q_MMS_j_n=ones(J,N)*0.3; % removed *2.0 (angular quantity)
   end
   
+  if~exist('phi0_guess_j','var')
+    phi0_guess_j=ones(J,1);
+  end
+  
   % Material
   Sig_ss_j=mat.Sig_ss_j;
   nuSig_f_j=mat.nuSig_f_j;
@@ -81,16 +86,15 @@ function [phi0_j]=Sn_module(FDM,J,N,Tau,mat,...
   % N rays to trace, each angle has only 1 ray, no ray-spacing
   % n for each angle, and j for FSR region index
   
-  phi0_j_old=ones(J,1);
   q_j_n=zeros(J,N);
+  phi0_old_j=phi0_guess_j;
   for iIterate=1:maxIterate
     for j=1:J
       for n=1:N
-        q_j_n(j,n)=(Sig_ss_j(j))*(phi0_j_old(j)-error_ang_j(j))*0.5+Q_MMS_j_n(j,n);
+        q_j_n(j,n)=(Sig_ss_j(j))*(phi0_old_j(j)-error_ang_j(j))*0.5+Q_MMS_j_n(j,n);
       end
     end
     phi0_j_new=zeros(J,1);
-
 
     %% backward direction
     for n=1:N/2
@@ -119,11 +123,11 @@ function [phi0_j]=Sn_module(FDM,J,N,Tau,mat,...
 %%
     % test for convergence
 %     error=norm(phi0_j_new-phi0_j_old);
-    error=max(abs(phi0_j_new-phi0_j_old)./(phi0_j_new+delta));
+    error=max(abs(phi0_j_new-phi0_old_j)./(phi0_j_new+delta));
     if error<epsilon_phi0
       break;
     end
-    phi0_j_old=phi0_j_new;
+    phi0_old_j=phi0_j_new;
   end  
 
   phi0_j=phi0_j_new;
