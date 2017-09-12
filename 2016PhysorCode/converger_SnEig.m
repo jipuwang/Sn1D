@@ -19,18 +19,18 @@ FDM=3;
 Tau=10; 
 
 % Case configure options
-if ~exist('assumedSoln','var')
+% if ~exist('assumedSoln','var')
   assumedSoln='constant';
   assumedSoln='linear';
   assumedSoln='quadratic';
 %   assumedSoln='plus1Sqrt';
-%   assumedSoln='flat_expMu';
   assumedSoln='sine';
-end
+  assumedSoln='flat_expMu';
+% end
 
-if ~exist('k_MMS','var')
-  assumedK=1.02;
-end
+% if ~exist('k_MMS','var')
+  k_MMS=1.02;
+% end
 
 gridMeshSize_iGrid=zeros(nGrids,1);
 error_phi0_iGrid=zeros(nGrids,1);
@@ -53,7 +53,7 @@ for iGrid=1:nGrids
     field4,value4,field5,value5,field6,value6,field7,value7);
 
   [phi0_j_ana,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_guess]=... 
-        manufacturer_SnEig(J,N,Tau,mat,assumedSoln,assumedK);
+        manufacturer_SnEig(J,N,Tau,mat,assumedSoln,k_MMS);
 
   %%
 %   error_ang_j=error_ang_j.*0.0;
@@ -66,8 +66,8 @@ for iGrid=1:nGrids
   [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
     psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_guess);
 
-  error_phi0_iGrid(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J);
-  error_k_iGrid(iGrid)=k-assumedK;
+  error_phi0_iGrid(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J)
+  error_k_iGrid(iGrid)=k-k_MMS
   
 end
 
