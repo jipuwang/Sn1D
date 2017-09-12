@@ -86,7 +86,7 @@ orderPlotGrid=[gridMeshSize_iGrid(1) gridMeshSize_iGrid(end)];
 
 scalarFluxErrorRMS_plot_handle=figure(13);
 loglog(gridMeshSize_iGrid,error_phi0_iGrid,'*');
-% title('scalar flux error convergence');
+title('scalar flux error convergence');
 xlabel('mesh size [cm]');
 ylabel('scalar flux error RMS');
 
@@ -107,13 +107,13 @@ hold off;
 
 kErrorRMS_plot_handle=figure(14);
 loglog(gridMeshSize_iGrid,error_k_iGrid,'*');
-% title('scalar flux error convergence');
+title('k error convergence');
 xlabel('mesh size [cm]');
 ylabel('k error');
 
 hold on;
 orderGuess=round(order_k_nMinus1(end));
-errorStt=error_phi0_iGrid(end)*refinementRatio^(orderGuess*(nGrids-1));
+errorStt=error_k_iGrid(end)*refinementRatio^(orderGuess*(nGrids-1));
 firstOrder=[errorStt errorStt/refinementRatio^(nGrids-1)];
 secondOrder=[errorStt errorStt/refinementRatio^(2*(nGrids-1))];
 thirdOrder=[errorStt errorStt/refinementRatio^(3*(nGrids-1))];
