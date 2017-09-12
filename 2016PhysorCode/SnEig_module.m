@@ -10,12 +10,9 @@
 %   Cell-averaged scalar flux
 
 function [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
-           psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j)
-
+           psi_b1_n,psi_b2_n,Q_MMS_j_n,...
+           error_ang_j,phi0_guess_j,k_guess)
 %   Input parameter
-  if ~exist('Tau','var')
-    Tau=10;
-  end
   if ~exist('FDM','var')
     FDM=3;
   end
@@ -24,6 +21,9 @@ function [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
   end
   if ~exist('N','var')
     N=16;
+  end
+  if ~exist('Tau','var')
+    Tau=10;
   end
   if ~exist('mat','var')
     % Material
@@ -38,94 +38,141 @@ function [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
       field4,value4,field5,value5,field6,value6,field7,value7);
   end
   if ~exist('psi_b1_n','var')
-    psi_b1_n=ones(N,1)*1.0;
+    psi_b1_n=ones(N,1)*0.0;
   end
   if ~exist('psi_b2_n','var')
-    psi_b2_n=ones(N,1)*1.0;
+    psi_b2_n=ones(N,1)*0.0;
   end
+  assert(norm(psi_b1_n)<1e-10,'Left incident flux is not zero.');
+  assert(norm(psi_b2_n)<1e-10,'Right incident flux is not zero.');
   if ~exist('Q_MMS_j_n','var')
     Q_MMS_j_n=ones(J,N)*0.3; % removed *2.0 (angular quantity)
+  end
+  if ~exist('phi0_guess_j','var')
+    phi0_guess_j=ones(J,1); % For MMS problem, this cannot be arbitray.
+  end
+  if ~exist('k_guess','var')
+    k_guess=1.0; % For MMS problem, this cannot be arbitrary.
   end
   
   % Material
   Sig_ss_j=mat.Sig_ss_j;
   nuSig_f_j=mat.nuSig_f_j;
   Sig_t_j=mat.Sig_t_j;
-
   Sig_t_inv_j=1./Sig_t_j;
-  
+
   % Default variables, can be customized. 
   maxIterate=2000;
+  outerMax=5000;
   epsilon_phi0=1e-13;
+  epsilon_k=1e-10;
   delta=1E-13;
   [mu_n,weight_n]=lgwt(N,-1,1); mu_n=flipud(mu_n);
   h_j=ones(J,1)*Tau/J;
   h=Tau/J;
-  
+
   % Spatial discretization Method
-  % =1 -> Step Method; Upwind; Implicit;Step;
-  % =2 -> Diamond Differencing;DD;
-  % =3 -> Step Characteristic;SC;
-  % would be alpha_nj(N,J) with nonuniform spatial grid
   switch FDM
-    case 1 % Step
+    case 1 % Step: Step Method; Upwind; Implicit;Step; 
       alpha_n=ones(N,1);
       alpha_n(1:N/2)=-1;
-    case 2 % DD
+    case 2 % DD: Diamond Differencing;
       alpha_n=zeros(N,1);
-    case 3 % SC
+    case 3 % SC: Step Characteristic;
       tao_n=h./mu_n;
       alpha_n=coth(0.5*tao_n)-2./tao_n;
   end % switch FDM
-  
-  % N rays to trace, each angle has only 1 ray, no ray-spacing
-  % n for each angle, and j for FSR region index
-  
-  phi0_j_old=ones(J,1);
-  q_j_n=zeros(J,N);
-  for iIterate=1:maxIterate
-    for j=1:J
-      for n=1:N
-        q_j_n(j,n)=(Sig_ss_j(j))*(phi0_j_old(j)-error_ang_j(j))*0.5+Q_MMS_j_n(j,n);
-      end
+
+  % Initial guess
+  phi0_old_outer_j=phi0_guess_j;
+  k_old=k_guess;
+  % Initialization
+  isOuterConverged=false;
+  F_j=zeros(J,1);   % to store fixed fission source
+  FixedSrc_j_n=zeros(J,N); % fission source plus MMS source
+
+  for iOuter=1:outerMax
+    % set up fission source
+    F_j=1/k_old*(nuSig_f_j.*phi0_old_outer_j);
+    % calculate generalized fixed source
+    for n=1:N
+      FixedSrc_j_n(:,n)=F_j*0.5+Q_MMS_j_n(:,n);
     end
-    phi0_j_new=zeros(J,1);
-
-
-    %% backward direction
-    for n=1:N/2
-      psi_in=psi_b2_n(n);
-      for j=J:-1:1
-        temp=abs(mu_n(n))+abs(alpha_n(n))*Sig_t_j(j)*h*0.5;
-        psi_out=((temp-0.5*Sig_t_j(j)*h)*psi_in+(q_j_n(j,n))*h)/(temp+0.5*Sig_t_j(j)*h);
-        psi_avg=0.5*(1+abs(alpha_n(n)))*psi_out+0.5*(1-abs(alpha_n(n)))*psi_in;
-        phi0_j_new(j)=phi0_j_new(j)+psi_avg*weight_n(n);
-        psi_in=psi_out;
-      end
-    end
-
-%% forward direction
-    for n=(N/2+1):N
-      psi_in=psi_b1_n(n);
-      for j=1:J
-        temp=mu_n(n)+alpha_n(n)*Sig_t_j(j)*h*0.5;
-        psi_out=((temp-0.5*Sig_t_j(j)*h)*psi_in+(q_j_n(j,n))*h)/(temp+0.5*Sig_t_j(j)*h);
-        psi_avg=0.5*(1+alpha_n(n))*psi_out+0.5*(1-alpha_n(n))*psi_in;
-        phi0_j_new(j)=phi0_j_new(j)+psi_avg*weight_n(n);
-        psi_in=psi_out;
-      end
-    end
-
-%%
-    % test for convergence
-%     error=norm(phi0_j_new-phi0_j_old);
-    error=max(abs(phi0_j_new-phi0_j_old)./(phi0_j_new+delta));
-    if error<epsilon_phi0
-      break;
-    end
-    phi0_j_old=phi0_j_new;
-  end  
-
-  phi0_j=phi0_j_new;
+    % call fixed source solver
+    [phi0_new_outer_j]=Sn_module(FDM,J,N,Tau,mat,...
+      psi_b1_n,psi_b2_n,FixedSrc_j_n,error_ang_j,phi0_old_outer_j);
+    % update eigenvalue
+    k_new=k_old*(sum(nuSig_f_j.*phi0_new_outer_j)*h)/(sum(nuSig_f_j.*phi0_old_outer_j)*h);
+    %%
+%     figure(111);hold on;
+%     plot(phi0_new_outer_j);
+%     drawnow;
     
+    %%
+    % check convergence
+    if max(abs(phi0_new_outer_j-phi0_old_outer_j)./ ...
+        (phi0_new_outer_j+delta)) < epsilon_phi0 ...
+            && (abs((k_new-k_old)/k_old) <= epsilon_k)
+            isOuterConverged=true;
+            break;
+    end
+    k_old=k_new;
+    phi0_old_outer_j=phi0_new_outer_j;
+  end
+  if ~isOuterConverged
+    display (['Not converging!' num2str(iOuter) ' iterations performed.']);
+  else
+    phi0_j=phi0_new_outer_j;
+    k=k_new;
+  end
 end
+  
+  %% The following gives you phi0_j with fixed source. 
+%   phi0_j_old=ones(J,1);
+%   q_j_n=zeros(J,N);
+%   for iIterate=1:maxIterate
+%     for j=1:J
+%       for n=1:N
+%         q_j_n(j,n)=(Sig_ss_j(j))*(phi0_j_old(j)-error_ang_j(j))*0.5+Q_MMS_j_n(j,n);
+%       end
+%     end
+%     phi0_j_new=zeros(J,1);
+% 
+% 
+%     %% backward direction
+%     for n=1:N/2
+%       psi_in=psi_b2_n(n);
+%       for j=J:-1:1
+%         temp=abs(mu_n(n))+abs(alpha_n(n))*Sig_t_j(j)*h*0.5;
+%         psi_out=((temp-0.5*Sig_t_j(j)*h)*psi_in+(q_j_n(j,n))*h)/(temp+0.5*Sig_t_j(j)*h);
+%         psi_avg=0.5*(1+abs(alpha_n(n)))*psi_out+0.5*(1-abs(alpha_n(n)))*psi_in;
+%         phi0_j_new(j)=phi0_j_new(j)+psi_avg*weight_n(n);
+%         psi_in=psi_out;
+%       end
+%     end
+% 
+% %% forward direction
+%     for n=(N/2+1):N
+%       psi_in=psi_b1_n(n);
+%       for j=1:J
+%         temp=mu_n(n)+alpha_n(n)*Sig_t_j(j)*h*0.5;
+%         psi_out=((temp-0.5*Sig_t_j(j)*h)*psi_in+(q_j_n(j,n))*h)/(temp+0.5*Sig_t_j(j)*h);
+%         psi_avg=0.5*(1+alpha_n(n))*psi_out+0.5*(1-alpha_n(n))*psi_in;
+%         phi0_j_new(j)=phi0_j_new(j)+psi_avg*weight_n(n);
+%         psi_in=psi_out;
+%       end
+%     end
+% 
+% %%
+%     % test for convergence
+% %     error=norm(phi0_j_new-phi0_j_old);
+%     error=max(abs(phi0_j_new-phi0_j_old)./(phi0_j_new+delta));
+%     if error<epsilon_phi0
+%       break;
+%     end
+%     phi0_j_old=phi0_j_new;
+%   end  
+% 
+%   phi0_j=phi0_j_new;
+%%
+
