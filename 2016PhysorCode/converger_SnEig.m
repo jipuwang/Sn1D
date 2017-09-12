@@ -139,7 +139,6 @@ display(['quad set order: ' num2str(N)]);
 
 error_phi0_iGrid
 order_phi0_nMinus1
-display(num2str(order_phi0_nMinus1(end)));
 error_k_iGrid
 order_k_nMinus1
 
