@@ -86,9 +86,9 @@ orderPlotGrid=[gridMeshSize_iGrid(1) gridMeshSize_iGrid(end)];
 
 scalarFluxErrorRMS_plot_handle=figure(13);
 loglog(gridMeshSize_iGrid,error_phi0_iGrid,'*');
-title('scalar flux error convergence');
+title('cell-averaged scalar flux error convergence');
 xlabel('mesh size [cm]');
-ylabel('scalar flux error RMS');
+ylabel('cell-averaged scalar flux error RMS');
 
 hold on;
 orderGuess=round(order_phi0_nMinus1(end));
@@ -104,8 +104,9 @@ loglog(orderPlotGrid,fourthOrder,'--');
 legend('scalar flux error','1st Order','2nd Order',...
   '3rd Order','4th Order','location','best');
 hold off;
+savefig(scalarFluxErrorRMS_plot_handle,'temp_Physor_2016_cellAveraged_scalar_flux_convergence');
 
-kErrorRMS_plot_handle=figure(14);
+kError_plot_handle=figure(14);
 loglog(gridMeshSize_iGrid,error_k_iGrid,'*');
 title('k error convergence');
 xlabel('mesh size [cm]');
@@ -125,6 +126,7 @@ loglog(orderPlotGrid,fourthOrder,'--');
 legend('k error','1st Order','2nd Order',...
   '3rd Order','4th Order','location','best');
 hold off;
+savefig(kError_plot_handle,'temp_Physor_2016_k_convergence');
 
 %% Dispaly the result
 % Display the problem description and results
