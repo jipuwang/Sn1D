@@ -13,7 +13,7 @@
 % clear;
 nGrids=4%8%4%4%6;%10;%8;
 refinementRatio=2;
-N=8; % angular discretization, fixed not refined. 
+N=2; % angular discretization, fixed not refined. 
 FDM=3;
 % Geometry
 Tau=10; 
