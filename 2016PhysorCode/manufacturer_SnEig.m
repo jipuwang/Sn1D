@@ -29,7 +29,7 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_gues
   if ~exist('assumedSoln','var')
     assumedSoln='constant';
   end
-  if ~exist('assumedK','var')
+  if ~exist('k_MMS','var')
     k_MMS=1.02;
   end
   
@@ -84,7 +84,7 @@ function [phi0_MMS_j,psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_gues
   % MMS source: mu_n * derivative(psi_MMS) +Sig_t* psi_MMS ...
   % -(Sig_ss+nuSig_f/k)*0.5*phi0_MMS;
   Q_MMS =@(x,mu) mu*psi_MMS_Diff(x,mu) +Sig_t(x).*psi_MMS(x,mu) ...
-    -(Sig_ss(x)+nuSig_f(x))*0.5.*phi0_MMS(x);
+    -(Sig_ss(x)+nuSig_f(x)/k_MMS)*0.5.*phi0_MMS(x);
   
   %% For MoC MMS solution and problem
   % Boundary condition and source
