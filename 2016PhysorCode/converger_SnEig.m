@@ -89,8 +89,8 @@ orderPlotGrid=[gridMeshSize_iGrid(1) gridMeshSize_iGrid(end)];
 
 scalarFluxErrorRMS_plot_handle=figure(13);
 loglog(gridMeshSize_iGrid,error_phi0_iGrid,'*');
-title({'cell-averaged scalar flux error convergence',['\phi_{MMS}: ' ...
-  assumedSoln '; k_{MMS}: ' num2str(k_MMS)]});
+title({'cell-averaged scalar flux error convergence',...
+  ['\phi_{MMS}: ' assumedSoln '; k_{MMS}: ' num2str(k_MMS)]});
 xlabel('mesh size [cm]');
 ylabel('cell-averaged scalar flux error RMS');
 
@@ -113,8 +113,8 @@ savefig(scalarFluxErrorRMS_plot_handle,['temp_SnEig_cellAveraged_phi_convergence
 
 kError_plot_handle=figure(14);
 loglog(gridMeshSize_iGrid,error_k_iGrid,'*');
-title({'k error convergence',['\phi_{MMS}: ' assumedSoln ...
-  '; k_{MMS}: ' num2str(k_MMS)]});
+title({'k error convergence',...
+  ['\phi_{MMS}: ' assumedSoln '; k_{MMS}: ' num2str(k_MMS)]});
 xlabel('mesh size [cm]');
 ylabel('k error');
 
