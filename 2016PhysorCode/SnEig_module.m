@@ -43,8 +43,8 @@ function [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
   if ~exist('psi_b2_n','var')
     psi_b2_n=ones(N,1)*0.0;
   end
-  assert(norm(psi_b1_n)<1e-10,'Left incident flux is not zero.');
-  assert(norm(psi_b2_n)<1e-10,'Right incident flux is not zero.');
+%   assert(norm(psi_b1_n)<1e-10,'Left incident flux is not zero.');
+%   assert(norm(psi_b2_n)<1e-10,'Right incident flux is not zero.');
   if ~exist('Q_MMS_j_n','var')
     Q_MMS_j_n=ones(J,N)*0.3; % removed *2.0 (angular quantity)
   end
@@ -90,17 +90,19 @@ function [phi0_j,k]=SnEig_module(FDM,J,N,Tau,mat,...
   isOuterConverged=false;
   F_j=zeros(J,1);   % to store fixed fission source
   FixedSrc_j_n=zeros(J,N); % fission source plus MMS source
-
+  
   for iOuter=1:outerMax
     % set up fission source
-    F_j=1/k_old*(nuSig_f_j.*(phi0_old_outer_j-error_ang_j));
+    F_j=1/k_old*(nuSig_f_j.*(phi0_old_outer_j));
     % calculate generalized fixed source
     for n=1:N
       FixedSrc_j_n(:,n)=F_j*0.5+Q_MMS_j_n(:,n);
     end
     % call fixed source solver
     [phi0_new_outer_j]=Sn_module(FDM,J,N,Tau,mat,...
-      psi_b1_n,psi_b2_n,FixedSrc_j_n,error_ang_j,phi0_old_outer_j-error_ang_j);
+      psi_b1_n,psi_b2_n,FixedSrc_j_n,error_ang_j,phi0_old_outer_j);
+    % Be really careful here!!! The initial guess is going to be stripped
+    % of the angular error in the Sn_module.  You should not do it here. 
     % update eigenvalue
     k_new=k_old*(sum(nuSig_f_j.*phi0_new_outer_j)*h)/(sum(nuSig_f_j.*phi0_old_outer_j)*h);
     %%
