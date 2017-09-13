@@ -25,7 +25,8 @@ Tau=10;
   assumedSoln='quadratic';
 %   assumedSoln='plus1Sqrt';
   assumedSoln='sine';
-  assumedSoln='flat_expMu';
+%   assumedSoln='flat_expMu';
+%   assumedSoln='flat_complex';
 % end
 
 % if ~exist('k_MMS','var')
