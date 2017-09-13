@@ -24,9 +24,9 @@ Tau=10;
   assumedSoln='linear';
   assumedSoln='quadratic';
 %   assumedSoln='plus1Sqrt';
-  assumedSoln='sine';
-%   assumedSoln='flat_expMu';
-%   assumedSoln='flat_complex';
+  assumedSoln='sine-exp';
+%   assumedSoln='flat-expMu';
+%   assumedSoln='flat-complex';
 % end
 
 % if ~exist('k_MMS','var')
@@ -70,7 +70,7 @@ for iGrid=1:nGrids
   error_phi0_iGrid(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J)
   error_k_iGrid(iGrid)=k*(sum(mat.nuSig_f_j.*(phi0_j-error_ang_j))*Tau/J)...
     /(sum(mat.nuSig_f_j.*(phi0_j))*Tau/J)...
-    -k_MMS;
+    -k_MMS
   
 end
 
@@ -89,7 +89,8 @@ orderPlotGrid=[gridMeshSize_iGrid(1) gridMeshSize_iGrid(end)];
 
 scalarFluxErrorRMS_plot_handle=figure(13);
 loglog(gridMeshSize_iGrid,error_phi0_iGrid,'*');
-title('cell-averaged scalar flux error convergence');
+title({'cell-averaged scalar flux error convergence',['\phi_{MMS}: ' ...
+  assumedSoln '; k_{MMS}: ' num2str(k_MMS)]});
 xlabel('mesh size [cm]');
 ylabel('cell-averaged scalar flux error RMS');
 
@@ -107,11 +108,13 @@ loglog(orderPlotGrid,fourthOrder,'--');
 legend('scalar flux error','1st Order','2nd Order',...
   '3rd Order','4th Order','location','best');
 hold off;
-savefig(scalarFluxErrorRMS_plot_handle,'temp_Physor_2016_cellAveraged_scalar_flux_convergence');
+savefig(scalarFluxErrorRMS_plot_handle,['temp_SnEig_cellAveraged_phi_convergence_' assumedSoln]);
+% savefig(scalarFluxErrorRMS_plot_handle,['SnEig_Physor2016_cellAveraged_phi_convergence_' assumedSoln]);
 
 kError_plot_handle=figure(14);
 loglog(gridMeshSize_iGrid,error_k_iGrid,'*');
-title('k error convergence');
+title({'k error convergence',['\phi_{MMS}: ' assumedSoln ...
+  '; k_{MMS}: ' num2str(k_MMS)]});
 xlabel('mesh size [cm]');
 ylabel('k error');
 
@@ -126,10 +129,11 @@ loglog(orderPlotGrid,firstOrder,'--');
 loglog(orderPlotGrid,secondOrder,'--');
 loglog(orderPlotGrid,thirdOrder,'--');
 loglog(orderPlotGrid,fourthOrder,'--');
-legend('k error','1st Order','2nd Order',...
+legend('k error','1st Order','2nd Order',...;
   '3rd Order','4th Order','location','best');
 hold off;
-savefig(kError_plot_handle,'temp_Physor_2016_k_convergence');
+savefig(kError_plot_handle,['temp_SnEig_Physor2016_k_convergence_' assumedSoln]);
+% savefig(kError_plot_handle,['SnEig_Physor2016_k_convergence_' assumedSoln]);
 
 %% Dispaly the result
 % Display the problem description and results
@@ -147,5 +151,3 @@ order_k_nMinus1
 
 order_phi0=order_phi0_nMinus1(end);
 order_k=order_k_nMinus1(end);
-
-% end
