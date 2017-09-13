@@ -90,13 +90,16 @@ loglog(orderPlotGrid,thirdOrder,'--');
 loglog(orderPlotGrid,fourthOrder,'--');
 legend('scalar flux error','1st Order','2nd Order',...
   '3rd Order','4th Order','location','northwest');
+
 hold off;
 
 %% Dispaly the result
 % Display the problem description and results
 disp '=================';
 display(['assumedSoln: ' assumedSoln]);
+display(['Number of grids: ' num2str(nGrids)]);
 display(['refinementRatio: ' num2str(refinementRatio)]);
+display(['FDM method: ' num2str(FDM)]);
 display(['quad set order: ' num2str(N)]);
 error_phi0_n
 order_phi_nMinus1
