@@ -73,7 +73,8 @@ orderPlotGrid=[gridMeshSize_n(1) gridMeshSize_n(end)];
 
 scalarFluxErrorRMS_plot_handle=figure(13);
 loglog(gridMeshSize_n,error_phi0_n,'*');
-% title('scalar flux error convergence');
+title({'cell-averaged scalar flux error convergence',...
+  ['\phi_{MMS}: ' assumedSoln]});
 xlabel('mesh size [cm]');
 ylabel('scalar flux error RMS');
 
@@ -90,9 +91,9 @@ loglog(orderPlotGrid,thirdOrder,'--');
 loglog(orderPlotGrid,fourthOrder,'--');
 legend('scalar flux error','1st Order','2nd Order',...
   '3rd Order','4th Order','location','northwest');
-
 hold off;
-
+% savefig(scalarFluxErrorRMS_plot_handle,['temp_Sn_cellAveraged_phi_convergence_' assumedSoln]);
+savefig(scalarFluxErrorRMS_plot_handle,['Sn_Physor2016_cellAveraged_phi_convergence_' assumedSoln]);
 %% Dispaly the result
 % Display the problem description and results
 disp '=================';
