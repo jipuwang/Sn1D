@@ -68,7 +68,9 @@ for iGrid=1:nGrids
     psi_b1_n,psi_b2_n,Q_MMS_j_n,error_ang_j,phi0_guess_j,k_guess);
 
   error_phi0_iGrid(iGrid)=norm(phi0_j-phi0_j_ana-error_ang_j,2)/sqrt(J)
-  error_k_iGrid(iGrid)=k-k_MMS
+  error_k_iGrid(iGrid)=k*(sum(mat.nuSig_f_j.*(phi0_j-error_ang_j))*Tau/J)...
+    /(sum(mat.nuSig_f_j.*(phi0_j))*Tau/J)...
+    -k_MMS;
   
 end
 
